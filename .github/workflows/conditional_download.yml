@@ -1,0 +1,42 @@
+name: Conditional NPM Download
+
+on:
+  push:
+    branches: [ main ]
+  schedule:
+    - cron: '0 * * * *' # Optional: Runs every hour
+  workflow_dispatch: # Allows you to run it manually for testing
+
+jobs:
+  download-library:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Roll the dice (60% chance)
+        id: dice_roll
+        run: |
+          # Generate a random number between 1 and 100
+          ROLL=$(( ( RANDOM % 100 )  + 1 ))
+          echo "Rolled a $ROLL"
+          
+          if [ $ROLL -le 60 ]; then
+            echo "Result: Success! Proceeding with download."
+            echo "should_download=true" >> $GITHUB_OUTPUT
+          else
+            echo "Result: Failed roll. Skipping download."
+            echo "should_download=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Download NPM Library
+        if: steps.dice_roll.outputs.should_download == 'true'
+        run: |
+          # Replace 'lodash' with your specific library
+          npm install lodash
+          echo "Library downloaded successfully."
