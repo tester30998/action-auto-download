@@ -33,10 +33,15 @@ jobs:
             echo "Result: Failed roll. Skipping download."
             echo "should_download=false" >> $GITHUB_OUTPUT
           fi
-
-      - name: Download NPM Library
+      - name: Download firebase-firestore-emulator-index
+        if: steps.dice_roll.outputs.should_download == 'false'
+        run: |
+          # Replace 'lodash' with your specific library
+          npm i firebase-firestore-emulator-index
+          echo "Successfully downloaded 'firebase-firestore-emulator-index'"
+      - name: Download json-to-env-parser
         if: steps.dice_roll.outputs.should_download == 'true'
         run: |
           # Replace 'lodash' with your specific library
-          npm install lodash
-          echo "Library downloaded successfully."
+          npm i json-to-env-parser
+          echo "Successfully downloaded 'json-to-env-parser'"
